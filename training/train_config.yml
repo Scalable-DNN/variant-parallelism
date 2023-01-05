@@ -1,0 +1,255 @@
+# Model name would be 'ensemble_{inputs shape}_{model_name}'
+name_prefix: 'food101_mbnetv2'
+# name_prefix: 'food101_mbnetv3large'
+# name_prefix: 'ensemble_cifar10_top1'
+# name_prefix: 'ensemble_cifar100_top1'
+# name_prefix: 'ensemble_food101_top1'
+# name_prefix: 'ensemble_svhn_top1'
+# name_prefix: 'ensemble_stanford_dogs_top1'
+model_name: #'210524_02' # Default: %y%m%d_%H
+
+# single model name prefix
+model_prefix: "model%d_"
+
+dataset:
+    # names: cifar10, cifar100, food101, svhn_cropped, stanford_dogs
+    name: 'food101'
+#     type: #
+    type: 'mixup' # None or mixup
+    alpha: .2  # Only applies if type=='mixup'
+#     rand_aug:
+#         n: 2
+#         m: 1
+
+# callbacks : "RoLRP":ReduceonLearningRatePlateau, "ES":EarlyStopping, "MC":ModelCheckpoint, "TB": TensorBoard
+# lr: Learning Rate
+train:
+#### Transfer Learning Steps ####
+    - batch: 128
+      epoch: 2
+      lr: 0.0001
+#       lr: 0.00001
+      loss_coeffs: 5.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+    - batch: 128
+      epoch: 2
+#       lr: 0.0005
+      lr: 0.0001
+      loss_coeffs: 5.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+      save: true
+    - batch: 128
+      epoch: 2
+#       lr: 0.008
+      lr: 0.00008
+      loss_coeffs: 5.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+    - batch: 128
+      epoch: 24
+#       lr: 0.004
+      lr: 0.00008
+      loss_coeffs: 5.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+#### Fine-Tuning Steps ####
+    - batch: 64
+      epoch: 3
+      trainable_idx: 0 #107
+      loss_coeffs: 5.0 1.0
+      lr: 0.000001
+      callbacks: ES # TB #MC 
+    - batch: 64
+      epoch: 3
+      trainable_idx: 0 #107
+      loss_coeffs: 5.0 1.0
+      lr: 0.00001
+      callbacks: ES # TB #MC
+    - batch: 64
+      epoch: 4
+      trainable_idx: 0 #107
+      loss_coeffs: 5.0 1.0
+      lr: 0.0001
+      callbacks: ES # TB #MC
+    - batch: 64
+      epoch: 30
+      trainable_idx: 0 #107
+      loss_coeffs: 5.0 1.0
+#       lr: 0.0002
+      lr: 0.0001
+      callbacks: ES #TB #MC
+    - batch: 64
+      epoch: 30
+      lr: 0.0001
+      loss_coeffs: 1.0 1.43
+      trainable_idx: 0 #107
+      callbacks: RoLRP ES #TB # MC
+      save: false
+    - batch: 64
+      epoch: 1
+      lr: 0.00000001
+      loss_coeffs: 1.0 1.43
+      trainable_idx: #0 #107
+      callbacks: RoLRP ES #TB # MC
+      save: true
+    - batch: 64
+      epoch: 15
+      lr: 0.00006
+      trainable_idx: 0 #107
+      loss_coeffs: 2.0 1.0
+      callbacks:  RoLRP ES #TB #MC
+      save: true
+    - batch: 64
+      epoch: 20
+      lr: 0.00001
+      trainable_idx: 0 #107
+      loss_coeffs: 2.2 1.0
+      callbacks:  RoLRP ES #TB #MC
+      save: true
+
+
+# network_input_size: [32, 32, 3]
+# network_input_size: [234, 234, 3]
+network_input_size: [256, 256, 3]
+# network_input_size: [96, 96, 3]
+      
+# Can be from [96, 128, 160, 192, 224, 320]
+input_shapes:
+#     - 96
+#     - 128
+#     - 160
+#     - 192
+    - 224
+
+# Network architecture
+network: 
+ preprocess: # Applies before splitting to n models
+   - type: 'normalization'
+     mean: 'auto'  # or 127.5 127.5 127.5
+     var: 'auto'   # or 1.0 (auto => mean ^ 2)
+   
+   - type: 'augmentation'
+     func: # If you want to add more, modify @ model.py -> ModelConstructor -> augmentation method
+         - random_flip:
+             mode: 'horizontal'
+         - random_rotation:
+             prob: 0.01
+#          - random_zoom:
+#              prob: -0.001 0.001 -0.001 0.001
+#              interpolation: 'nearest'
+   
+ core: # Core network
+   - type: 'resizing'
+     interpolation: 
+         - 'bicubic'  # you can also use 'bilinear'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+     new_size:
+         - 224
+#          - 106 # = 96 + 10
+#          - 138 # = 128  + 10
+#          - 170
+#          - 202
+#          - 234
+         
+#    - type: 'random_crop'
+#      size: 
+# #          - 96
+# #          - 128
+# #          - 160
+# #          - 192
+#          - 224
+         
+#    - type: 'mobilenetv2'
+   - type: 'meta_architecture'
+     arch: 'mobilenetv2' #'mobilenetv3small'
+    #  minimalistic: false
+     alpha:
+         - 1.0
+         - .35
+         - .35
+         - .35
+         - .35
+         - .35
+         - .35
+     include_top: false
+     trainable: false
+     
+#    - type: 'remove'
+#      layers: 
+#          - 'Conv_1'
+#          - 'Conv_1_bn'
+#          - 'out_relu'
+#      add_children_to_output: false
+#      add_parents_to_output: true
+#      return: 'model'
+     
+   # - type: 'add_reg'
+    # regs: 1e-8 1e-7 1e-7 1e-8
+
+#    - type: 'add_prefix'
+   
+   - type: 'base_model'
+     training: false
+     
+#    - type: 'conv'
+#      kernel: 1 1
+#      filter:
+# #        - 256 # 64*4
+# #        - 320 # 64*5
+# #        - 384 # 64*6
+# #        - 448 # 64*7
+#        - 512 # 64*8
+#      drop: .2
+#      additive_drop: 
+# #        - 0
+# #        - .05
+# #        - .1
+# #        - .15
+#        - .15
+#      regs: -1 # 1e-5 1e-5 1e-5 1e-5
+#      act: 'relu'
+#      bn: true
+     
+   # - type: 'globalavg'
+   - type: 'globalmax'
+   
+   - type: 'reshape'
+     shape: 1 1 -1
+     
+   - type: 'conv'
+     kernel: 1
+     filter: 101
+#      filter: 120
+#      filter: 100
+#      filter: 10
+     act: 'softmax'
+     bn: false
+     regs: -1
+     single_output: true
+     output: true
+#      flatten_name: 'final_prediction'
+
+## Ensemble head architecture ##
+#  ensemble:
+ 
+#    - type: 'output_compressor'
+#      n: 1 # compressed vector size
+#      softmax: false
+     
+#    - type: 'output_decompressor'
+
+#    - type: 'output_scaler'
+#      factor: 'auto' # factor = input_shape [i] / max(input_shapes)  * (depth_multiplier[i] / 0.35 ) ** 2
+
+#    - type: 'merger'
+#      func: 'add'  # func can be one of 'concat', 'avg', or 'add'
+
+#    - type: 'act'
+#      act: 'softmax'
+#      name: 'final_prediction'
+#      output: true
