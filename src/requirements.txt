@@ -2,3 +2,10 @@ jupyterlab
 tensorflow-datasets
 larq
 jedi
+tensorflow-addons
+networkx
+six
+pydot
+pydotplus
+graphviz
+matplotlib
