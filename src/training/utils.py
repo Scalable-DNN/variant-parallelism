@@ -15,7 +15,7 @@ def keys_validator(layer: dict, keys: set=None):
             'input_shapes', 'trainable', 'layers', 'add_children_to_output',
             'add_parents_to_output', 'return', 'regs', 'training', 'kernel',
             'filter', 'drop', 'act', 'bn', 'single_output', 'output', 'n', 'inference',
-            'flatten_name', 'func', 'name', 'additive_drop', 'mode', 'weights',
+            'flatten_name', 'func', 'name', 'additive_drop', 'mode', 'weights', 'tflite',
            } if keys is None else keys
     layer_keys = layer.keys()
     for key in keys:
