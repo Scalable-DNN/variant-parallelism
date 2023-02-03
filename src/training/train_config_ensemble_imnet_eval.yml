@@ -2,7 +2,7 @@
 # name_prefix: 'cifar10_mbnetv2'
 name_prefix: 'ensemble_imagenet_mbnetv2'
 # name_prefix: 'food101_mbnetv3large'
-# name_prefix: 'ensemble_cifar10_top1'
+# name_prefix: 'ensemble_cifar10'
 # name_prefix: 'ensemble_cifar100_top1'
 # name_prefix: 'ensemble_food101_top1'
 # name_prefix: 'ensemble_svhn_top1'
@@ -15,9 +15,11 @@ model_prefix: "model%d_"
 dataset:
     # names: cifar10, cifar100, food101, svhn_cropped, stanford_dogs
     name: 'imagenet2012'
-#     type: #
-    type: 'mixup' # None or mixup
-    alpha: .2  # Only applies if type=='mixup'
+    network_input_size: [256, 256, 3]
+    # name: 'cifar10'
+    type: #
+    # type: 'mixup' # None or mixup
+    # alpha: .2  # Only applies if type=='mixup'
 #     rand_aug:
 #         n: 2
 #         m: 1
@@ -26,41 +28,50 @@ dataset:
 # lr: Learning Rate
 train:
 #### Transfer Learning Steps ####
-    - batch: 512
+    - batch: 256
       epoch: 2
-      # lr: 0.0001
-      lr: 0.00001
+      lr: 0.001
+      # lr: 0.00001
       loss_coeffs: 5.0 1.0
       callbacks: ES # TB
       trainable_idx: # 
     - batch: 512
       epoch: 2
-#       lr: 0.0005
-      lr: 0.0001
+      lr: 0.005
+      # lr: 0.00001
       loss_coeffs: 5.0 1.0
       callbacks: ES # TB
       trainable_idx: # 
       save: true
     - batch: 512
       epoch: 2
-#       lr: 0.008
-      lr: 0.00008
+      lr: 0.0008
+      # lr: 0.00008
       loss_coeffs: 5.0 1.0
       callbacks: ES # TB
       trainable_idx: # 
     - batch: 512
       epoch: 24
-#       lr: 0.004
-      lr: 0.00008
+      lr: 0.005
+      # lr: 0.00008
       loss_coeffs: 5.0 1.0
       callbacks: ES # TB
       trainable_idx: # 
+      save: true
+    - batch: 512
+      epoch: 20
+      lr: 0.005
+      # lr: 0.00008
+      loss_coeffs: 5.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+      save: true
 ### Fine-Tuning Steps ####
     - batch: 128
       epoch: 3
       trainable_idx: 0 #107
       loss_coeffs: 5.0 1.0
-      lr: 0.000001
+      lr: 0.00001
       callbacks: ES # TB #MC 
     - batch: 128
       epoch: 3
@@ -113,18 +124,29 @@ train:
 
 # network_input_size: [32, 32, 3]
 # network_input_size: [234, 234, 3]
-network_input_size: [256, 256, 3]
+# network_input_size: [256, 256, 3]
+# network_input_size: [512, 512, 3]
 # network_input_size: [96, 96, 3]
       
 # Can be from [96, 128, 160, 192, 224, 320]
 input_shapes:
     - 96
+    - 96
+    - 128
     - 128
     - 160
+    - 160
+    - 192
     - 192
     - 224
-    - 256
-    - 320
+    - 224
+    - 224
+    - 224
+    # - 256
+    # - 256
+    # - 320
+    # - 320
+    # - 384
 
 # Network architecture
 network: 
@@ -133,45 +155,102 @@ network:
      mean: 'auto'  # or 127.5 127.5 127.5
      var: 'auto'   # or 1.0 (auto => mean ^ 2)
    
-   - type: 'augmentation'
-     func: # If you want to add more, modify @ model.py -> ModelConstructor -> augmentation method
-         - random_flip:
-             mode: 'horizontal'
-         - random_rotation:
-             prob: 0.01
+  #  - type: 'augmentation'
+  #    func: # If you want to add more, modify @ model.py -> ModelConstructor -> augmentation method
+  #        - random_flip:
+  #            mode: 'horizontal'
+  #        - random_rotation:
+  #            prob: 0.01
 #          - random_zoom:
 #              prob: -0.001 0.001 -0.001 0.001
 #              interpolation: 'nearest'
    
  core: # Core network
    - type: 'resizing'
-     interpolation: 
-         - 'bicubic'  # you can also use 'bilinear'
-         - 'bicubic'
-         - 'bicubic'
-         - 'bicubic'
-         - 'bicubic'
-         - 'bicubic'
-         - 'bicubic'
      new_size:
-        #  - 224
-         - 106 # = 96 + 10
-         - 138 # = 128  + 10
-         - 170
-         - 202
-         - 234
-         - 266
-         - 330
+        - 96
+        - 96
+        - 128
+        - 128
+        - 160
+        - 160
+        - 192
+        - 192
+        - 224
+        - 224
+        - 224
+        - 224
+     interpolation: 
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+        - 'bilinear'
+  #  - type: 'resizing'
+  #    interpolation: 
+  #        - 'bicubic'  # you can also use 'bilinear'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #        - 'bicubic'
+  #    new_size:
+  #       #  - 224
+  #        - 106 # = 96 + 10
+  #        - 106 # = 96 + 10
+  #        - 138 # = 128  + 10
+  #        - 138 # = 128  + 10
+  #        - 170
+  #        - 170
+  #        - 202
+  #        - 202
+  #        - 234
+  #        - 234
+  #        - 234
+  #        - 266
+  #       #  - 266
+  #       #  - 330
+  #        - 330
+  #        - 394
          
-   - type: 'random_crop'
-     size: 
-         - 96
-         - 128
-         - 160
-         - 192
-         - 224
-         - 256
-         - 320
+  #  - type: 'random_crop'
+  #    size: 
+  #        - 96
+  #        - 96
+  #        - 128
+  #        - 128
+  #        - 160
+  #        - 160
+  #        - 192
+  #        - 192
+  #        - 224
+  #        - 224
+  #        - 224
+  #        - 256
+  #       #  - 256
+  #       #  - 320
+  #        - 320
+  #        - 384
          
 #    - type: 'mobilenetv2'
    - type: 'meta_architecture'
@@ -180,77 +259,105 @@ network:
      alpha:
         #  - 1.0
          - .35
+         - .5
          - .35
+         - .5
          - .35
+         - .5
          - .35
+         - .5
          - .35
+         - .5
+         - 1.
+         - 1.4
          - .35
-         - .35
+        #  - .5
         #  - .35
+         - .5
      include_top: true
      trainable: false
      
-#    - type: 'remove'
-#      layers: 
-#          - 'Conv_1'
-#          - 'Conv_1_bn'
-#          - 'out_relu'
-#      add_children_to_output: false
-#      add_parents_to_output: true
-#      return: 'model'
+  #  - type: 'remove'
+  #    layers: 
+  #        - 'Conv_1'
+  #        - 'Conv_1_bn'
+  #        - 'out_relu'
+  #    add_children_to_output: false
+  #    add_parents_to_output: true
+  #    return: 'model'
      
-   # - type: 'add_reg'
-    # regs: 1e-8 1e-7 1e-7 1e-8
+  #  - type: 'add_reg'
+  #    regs: 1e-8 1e-7 1e-7 1e-8
 
-#    - type: 'add_prefix'
+   - type: 'add_prefix'
    
    - type: 'base_model'
      training: false
+     single_output: true
+     output: true
      
 #    - type: 'conv'
 #      kernel: 1 1
 #      filter:
-# #        - 256 # 64*4
-# #        - 320 # 64*5
-# #        - 384 # 64*6
-# #        - 448 # 64*7
+#        - 256 # 64*4
+#        - 320 # 64*5
+#        - 384 # 64*6
+#        - 448 # 64*7
 #        - 512 # 64*8
-#      drop: .2
-#      additive_drop: 
-# #        - 0
-# #        - .05
-# #        - .1
-# #        - .15
-#        - .15
+#        - 512 # 64*8
+#        - 576 # 64*9
+#       #  - 576 # 64*9
+#       #  - 640 # 64*10
+#        - 640 # 64*10
+#        - 704 # 64*11
+#     #  filter:
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#     #   - 1280
+#      drop: .15
+#     #  additive_drop: 
+#     #    - 0
+#     #    - .05
+#     #    - .1
+#     #    - .15
+#     #    - .15
+#     #    - .15
+#     #    - .15
 #      regs: -1 # 1e-5 1e-5 1e-5 1e-5
 #      act: 'relu'
 #      bn: true
      
-   # - type: 'globalavg'
-   - type: 'globalmax'
+# #    # - type: 'globalavg'
+#    - type: 'globalmax'
    
-   - type: 'reshape'
-     shape: 1 1 -1
+#    - type: 'reshape'
+#      shape: 1 1 -1
      
-   - type: 'conv'
-     kernel: 1
-    #  filter: 101
-#      filter: 120
-#      filter: 100
-    #  filter: 10
-     filter: 1000
-     act: 'softmax'
-     bn: false
-     regs: -1
-     single_output: true
-     output: true
+#    - type: 'conv'
+#      kernel: 1
+# #     #  filter: 101
+# # #      filter: 120
+# # #      filter: 100
+# #     #  filter: 10
+#      filter: 1000
+#      act: 'softmax'
+#      bn: false
+#      regs: -1
+#      single_output: true
+#      output: true
 #      flatten_name: 'final_prediction'
 
 ## Ensemble head architecture ##
  ensemble:
  
    - type: 'output_compressor'
-     n: 2 # compressed vector size
+     n: 10 # compressed vector size
      softmax: false
      
    - type: 'output_decompressor'

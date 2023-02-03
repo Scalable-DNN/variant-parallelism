@@ -1,0 +1,620 @@
+# Model name would be 'ensemble_{inputs shape}_{model_name}'
+# name_prefix: 'cifar10_mbnetv2'
+name_prefix: 'ensemble_imagenet_mbnetv2'
+# name_prefix: 'food101_mbnetv3large'
+# name_prefix: 'ensemble_cifar10'
+# name_prefix: 'ensemble_cifar100_top1'
+# name_prefix: 'ensemble_food101_top1'
+# name_prefix: 'ensemble_svhn_top1'
+# name_prefix: 'ensemble_stanford_dogs_top1'
+model_name: #'210524_02' # Default: %y%m%d_%H
+
+# single model name prefix
+model_prefix: "model%d_"
+
+dataset:
+    # names: cifar10, cifar100, food101, svhn_cropped, stanford_dogs
+    name: 'imagenet2012'
+    network_input_size: [256, 256, 3]
+    # name: 'cifar10'
+    # type: #
+    type: 'mixup' # None or mixup
+    alpha: .2  # Only applies if type=='mixup'
+#     rand_aug:
+#         n: 2
+#         m: 1
+
+# callbacks : "RoLRP":ReduceonLearningRatePlateau, "ES":EarlyStopping, "MC":ModelCheckpoint, "TB": TensorBoard
+# lr: Learning Rate
+train:
+#### Transfer Learning Steps ####
+    - batch: 256
+      epoch: 5
+      lr: 0.001
+      # lr: 0.00001
+      loss_coeffs: 1.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+      save: true
+    - batch: 256
+      epoch: 35
+      lr: 0.001
+      # lr: 0.00001
+      loss_coeffs: 1.0 1.0
+      callbacks: ES # TB
+      trainable_idx: # 
+      save: true
+    # - batch: 256
+    #   epoch: 10
+    #   lr: 0.0008
+    #   # lr: 0.00001
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+    # - batch: 128
+    #   epoch: 10
+    #   lr: 0.00064
+    #   # lr: 0.00001
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+    #######################
+    # - batch: 512
+    #   epoch: 2
+    #   lr: 0.001
+    #   # lr: 0.00001
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+    # - batch: 512
+    #   epoch: 2
+    #   lr: 0.005
+    #   # lr: 0.00001
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+    # - batch: 512
+    #   epoch: 2
+    #   lr: 0.0008
+    #   # lr: 0.00008
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    # - batch: 512
+    #   epoch: 60
+    #   # lr: 0.0005
+    #   lr: 0.0005
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+    # - batch: 512
+    #   epoch: 35
+    #   # lr: 0.0005
+    #   lr: 0.0001
+    #   loss_coeffs: 5.0 1.0
+    #   callbacks: ES # TB
+    #   trainable_idx: # 
+    #   save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: false
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     - batch: 512
+#       epoch: 2
+#       # lr: 0.0005
+#       lr: 0.00001
+#       loss_coeffs: 5.0 1.0
+#       callbacks: ES # TB
+#       trainable_idx: # 
+#       save: true
+#     # - batch: 512
+#     #   epoch: 24
+#     #   lr: 0.01
+#     #   # lr: 0.005
+#     #   # lr: 0.00008
+#     #   loss_coeffs: 5.0 1.0
+#     #   callbacks: ES # TB
+#     #   trainable_idx: # 
+#     #   save: true
+#     # - batch: 512
+#     #   epoch: 20
+#     #   lr: 0.005
+#     #   # lr: 0.00008
+#     #   loss_coeffs: 5.0 1.0
+#     #   callbacks: ES # TB
+#     #   trainable_idx: # 
+#     #   save: true
+# ### Fine-Tuning Steps ####
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 # (beginning of block 9 of 16 blocks) #107 (beginning of block 11 of 16 blocks)
+      loss_coeffs: 1.0 0
+      lr: 0.0001
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.0001
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.00008
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.00008
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.000064
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.000064
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 256
+      epoch: 5
+      trainable_idx: 81 #107
+      loss_coeffs: 1.0 0
+      lr: 0.000064
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 32
+      epoch: 5
+      trainable_idx: 0 #107
+      loss_coeffs: 1.0 0
+      lr: 0.00001
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 32
+      epoch: 5
+      trainable_idx: 0 #107
+      loss_coeffs: 1.0 0
+      lr: 0.00001
+      callbacks: ES # TB #MC 
+      save: true
+    - batch: 32
+      epoch: 5
+      trainable_idx: 0 #107
+      loss_coeffs: 1.0 0
+      lr: 0.00001
+      callbacks: ES # TB #MC 
+      save: true
+#     - batch: 64
+#       epoch: 3
+#       trainable_idx: 0 #107
+#       loss_coeffs: 5.0 1.0
+#       lr: 0.00001
+#       callbacks: ES # TB #MC 
+#       save: true
+#     - batch: 64
+#       epoch: 3
+#       trainable_idx: 0 #107
+#       loss_coeffs: 5.0 1.0
+#       lr: 0.00001
+#       callbacks: ES # TB #MC
+#       save: true
+#     - batch: 64
+#       epoch: 4
+#       trainable_idx: 0 #107
+#       loss_coeffs: 5.0 1.0
+#       save: true
+#       lr: 0.0001
+#       callbacks: ES # TB #MC
+#       save: true
+#     - batch: 64
+#       epoch: 30
+#       trainable_idx: 0 #107
+#       loss_coeffs: 5.0 1.0
+# #       lr: 0.0002
+#       lr: 0.0001
+#       callbacks: ES #TB #MC
+#       save: true
+#     - batch: 64
+#       epoch: 30
+#       lr: 0.0001
+#       loss_coeffs: 1.0 1.43
+#       trainable_idx: 0 #107
+#       callbacks: RoLRP ES #TB # MC
+#       save: true
+#     - batch: 64
+#       epoch: 1
+#       lr: 0.00000001
+#       loss_coeffs: 1.0 1.43
+#       trainable_idx: #0 #107
+#       callbacks: RoLRP ES #TB # MC
+#       save: true
+#     - batch: 64
+#       epoch: 15
+#       lr: 0.00006
+#       trainable_idx: 0 #107
+#       loss_coeffs: 2.0 1.0
+#       callbacks:  RoLRP ES #TB #MC
+#       save: true
+#     - batch: 64
+#       epoch: 20
+#       lr: 0.00001
+#       trainable_idx: 0 #107
+#       loss_coeffs: 2.2 1.0
+#       callbacks:  RoLRP ES #TB #MC
+#       save: true
+
+
+# network_input_size: [32, 32, 3]
+# network_input_size: [234, 234, 3]
+# network_input_size: [256, 256, 3]
+# network_input_size: [512, 512, 3]
+# network_input_size: [96, 96, 3]
+      
+# Can be from [96, 128, 160, 192, 224, 320]
+input_shapes:
+    - 96  #0
+    - 128 #1
+    - 160 #2
+    - 192 #3
+    - 224 #4
+    - 256 #5
+    - 320 #6
+    # - 224
+    - 96  #7
+    - 128 #8
+    - 160 #9
+    - 192 #10
+    - 224 #11
+    - 256 #12
+    - 320 #13
+    - 224 #14
+    # - 320
+    # - 384
+
+# Network architecture
+network: 
+ preprocess: # Applies before splitting to n models
+   - type: 'normalization'
+     mean: 'auto'  # or 127.5 127.5 127.5
+     var: 'auto'   # or 1.0 (auto => mean ^ 2)
+   
+   - type: 'augmentation'
+     func: # If you need to add more, modify @ model.py -> ModelConstructor -> augmentation method
+         - random_flip:
+             mode: 'horizontal'
+        #  - random_rotation:
+        #      prob: 0.01
+        #  - random_zoom:
+        #      prob: -0.001 0.001 -0.001 0.001
+        #      interpolation: 'nearest'
+   
+ core: # Core network
+  #  - type: 'resizing'
+  #    new_size:
+  #       - 96
+  #       - 96
+  #       - 128
+  #       - 128
+  #       - 160
+  #       - 160
+  #       - 192
+  #       - 192
+  #       - 224
+  #       - 224
+  #       - 224
+  #    interpolation: 
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+  #       - 'bilinear'
+   - type: 'resizing'
+     interpolation: 
+         - 'bicubic'  # you can also use 'bilinear'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+         - 'bicubic'
+     new_size:
+         - 106 # = 96 + 10
+         - 138 # = 128  + 10
+         - 170 # = 160 + 10
+         - 202 # = 192 + 10
+         - 234 # = 224 + 10
+         - 266 # = 256 + 10
+         - 330 # = 320 + 10
+        #  - 234 # = 224 + 10
+         - 106 # = 96 + 10
+         - 138 # = 128  + 10
+         - 170 # = 160 + 10
+         - 202 # = 192 + 10
+         - 234 # = 224 + 10
+         - 266 # = 256 + 10
+         - 330 # = 320 + 10
+         - 224
+        #  - 394 # = 384 + 10
+         
+   - type: 'random_crop'
+     size: 
+         - 96
+         - 128
+         - 160
+         - 192
+         - 224
+         - 256
+         - 320
+        #  - 224
+         - 96
+         - 128
+         - 160
+         - 192
+         - 224
+         - 256
+         - 320
+         - 224
+        #  - 384
+         
+#    - type: 'mobilenetv2'
+   - type: 'meta_architecture'
+     arch: 'mobilenetv2' #'mobilenetv3small'
+    #  minimalistic: false
+     alpha:
+         - .35
+         - .35
+         - .35
+         - .35
+         - .35
+         - .35
+         - .35
+        #  - .5 # should have been 1. instead of .5. Just a mistake!
+         - .5
+         - .5
+         - .5
+         - .5
+         - .5
+         - .5         
+         - .5
+         - 1
+     include_top: false
+     trainable: false
+     
+   - type: 'remove'
+     layers: 
+         - 'Conv_1'
+         - 'Conv_1_bn'
+         - 'out_relu'
+     add_children_to_output: false
+     add_parents_to_output: true
+     return: 'model'
+     
+  #  - type: 'add_reg'
+  #    regs: 1e-8 1e-7 1e-7 1e-8
+
+   - type: 'add_prefix'
+   
+   - type: 'base_model'
+     training: false
+    #  single_output: true
+    #  output: true
+     
+   - type: 'conv'
+     kernel: 1 1
+     filter:
+        - 256 # 64*4
+        - 320 # 64*5
+        - 384 # 64*6
+        - 448 # 64*7
+        - 512 # 64*8
+      #  - 512 # 64*8
+        - 576 # 64*9
+      # #  - 576 # 64*9
+        - 640 # 64*10
+      #  - 640 # 64*10
+      #  - 704 # 64*11
+    #  filter:
+    #   - 1280
+    #   - 1280
+    #   - 1280
+    #   - 1280
+    #   - 1280
+    #   - 1280
+    #   - 1280
+      # - 1280
+        - 576 # 64*6
+        - 704 # 64*7
+        - 832 # 64*8
+        - 960 # 64*8
+        - 1088 # 64*9
+        - 1216 # 64*10
+        - 1280 # 64*11
+        - 1280
+     drop: 0.05
+    #  additive_drop: 
+    #   - 0
+    #   - 0
+    #   - 0
+    #   - 0
+    #   - 0
+    #   - 0
+    #   - 0
+    #   # - 0
+    #   - 0
+    #   - 0
+    #   - 0
+    #   - 0.05
+    #   - 0.05
+    #   - 0.1
+    #   - 0.1
+     regs: -1 # 1e-5 1e-5 1e-5 1e-5
+     act: 'relu'
+     bn: true
+     
+#    # - type: 'globalavg'
+   - type: 'globalmax'
+   
+   - type: 'reshape'
+     shape: 1 1 -1
+     
+   - type: 'conv'
+     kernel: 1
+#     #  filter: 101
+# #      filter: 120
+# #      filter: 100
+#     #  filter: 10
+     filter: 1000
+     act: 'softmax'
+     bn: false
+     regs: -1
+     single_output: true
+     output: true
+    #  flatten_name: 'final_prediction'
+
+## Ensemble head architecture ##
+ ensemble:
+ 
+   - type: 'output_compressor'
+     n: 10 # compressed vector size
+     softmax: false
+     
+   - type: 'output_decompressor'
+
+   - type: 'output_scaler'
+     factor: 'auto' # factor = input_shape [i] / max(input_shapes)  * (depth_multiplier[i] / 0.35 ) ** 2
+
+   - type: 'merger'
+     func: 'add'  # func can be one of 'concat', 'avg', or 'add'
+
+   - type: 'act'
+     act: 'softmax'
+     name: 'final_prediction'
+    #  output: true
+     output: false
