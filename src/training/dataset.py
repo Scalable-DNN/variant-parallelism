@@ -46,7 +46,7 @@ class Dataset:
         if self.dataset in ['food101', 'stanford_dogs', 'imagenet2012']:
 #             return True, lambda x, y: (tf.image.resize(x, (96, 96), 'bilinear'), y)
 #             return True, lambda x, y: (tf.image.resize(x, (234, 234), 'bilinear'), y)
-            return True, lambda x, y: (tf.image.resize(x, (256, 256), 'bilinear'), y)
+            return True, lambda x, y: (tf.image.resize(x, self.dataset_config['network_input_size'][:2], 'bilinear'), y)
         
         return False, None
         
@@ -87,9 +87,16 @@ class Dataset:
         batch = self.batch if batch is None else batch
         shuffle = self.shuffle if shuffle is None else shuffle
 #         tfd_train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).shuffle(shuffle)
-        tfd_train, ds_info = tfds.load(self.dataset, split='train', shuffle_files=True, as_supervised=True, with_info=True)
+        if self.dataset in ['imagenet2012']:
+            tfd_train, ds_info = tfds.load(self.dataset, split='train', shuffle_files=True, as_supervised=True, with_info=True)
+        else:
+            tfd_train, ds_info = tfds.load(self.dataset, split='train', shuffle_files=True, as_supervised=True, with_info=True)
     
         num_classes = ds_info.features['label'].num_classes
+
+        if self.dataset not in ['imagenet2012']:
+            print("Data Shuffling is enabled.")
+            tfd_train = tfd_train.shuffle(shuffle)
                     
         if self.rand_aug:
             tfd_train = tfd_train.map(
@@ -100,7 +107,6 @@ class Dataset:
             tfd_train = tfd_train.map(map_func, num_parallel_calls=self.AUTO)
             
         tfd_train = (tfd_train
-             .shuffle(shuffle)
              .batch(batch, drop_remainder=True)
              .map(lambda x, y: (x, tf.one_hot(y, num_classes)), num_parallel_calls=self.AUTO)
              .prefetch(self.AUTO))
