@@ -391,7 +391,7 @@ class NetworkConstructor:
             if layer['factor'] == 'auto':
                 factor = self.single_input_shapes[self.current_model_idx] / max(self.single_input_shapes)
 #                 factor = self.single_input_shapes[self.current_model_idx] / 224
-                factor *= (self.depthwise_multipliers[self.current_model_idx] / .35) ** 2
+                factor *= (self.depthwise_multipliers[self.current_model_idx] / .35) ** 1.15
             elif isinstance(layer['factor'], list):
                 factor = float(layer['factor'][self.current_model_idx])
             elif isinstance(layer['factor'], float):
@@ -491,5 +491,8 @@ class NetworkConstructor:
                 if i < idx:
                     layer.trainable = False
                 # print(f"{i+1:<5}{layer.name:<50}", ['frozen', 'trainable'][int(layer.trainable)])
+                
+                # if i % 5 == 0:
+                #     input()
         
         return model
