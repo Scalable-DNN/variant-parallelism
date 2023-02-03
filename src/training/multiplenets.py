@@ -2,13 +2,23 @@ import os, gc
 from pathlib import Path
 import shutil
 from datetime import datetime
+import argparse
 
 import yaml
 
 code_path = Path(os.path.realpath(__file__))
 dir_path = code_path.parent
 
-config_name = 'train_config.yml'
+parser = argparse.ArgumentParser(
+                    prog = 'model_trainer',
+                    description = 'Trains Variant models')
+
+parser.add_argument('-c', '--config')
+
+args = parser.parse_args()
+
+# config_name = 'train_config.yml'
+config_name = args.config
 with open(dir_path / config_name, 'r') as yaml_file:
     tconf = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
@@ -42,9 +52,7 @@ model_name = model_name % tconf['model_name']
 utils.printd(f"MODEL NAME: {model_name}")
 
 model_path = consts.Paths.trained_models_dir / model_name
-input_size = tconf['network_input_size']
-# input_size = [int(s) for s in tconf['network_input_size'].split(',')]
-
+input_size = tconf['dataset']['network_input_size']
 
     
 def construct_model():
@@ -164,6 +172,7 @@ def train(model, train_step_config, single_outputs_names, final_outputs_names):
     
     
     optimizer = tf.keras.optimizers.Adam(train_step_config['lr'])
+    # optimizer = tf.keras.optimizers.RMSprop(train_step_config['lr'])
     
     
     # Check whether model has ensemble head
@@ -183,7 +192,7 @@ def train(model, train_step_config, single_outputs_names, final_outputs_names):
         model = model_c.set_trainable_param(model, train_step_config['trainable_idx'])
     
     model.compile(optimizer=optimizer, loss=losses, loss_weights=loss_weights, metrics=['accuracy'])
-    model.fit(tfd_train, validation_data=tfd_test, epochs=train_step_config['epoch'], callbacks=callbacks, verbose=2)
+    model.fit(tfd_train, validation_data=tfd_test, epochs=train_step_config['epoch'], callbacks=callbacks, verbose=1)
 
 
 def get_callbacks(cb_keys, monitor='val_final_prediction_accuracy'):
@@ -200,7 +209,7 @@ def get_callbacks(cb_keys, monitor='val_final_prediction_accuracy'):
                                  
 def evaluate(do_save=False):
     tfd_test = dataset.get_tfds_test(tstep['batch'] * 2, max_n=-1)
-    evs = model.evaluate(tfd_test, verbose=0)
+    evs = model.evaluate(tfd_test, verbose=1)
     msg = ''
     msg += f' {final_outputs_name[-1]:<30}{evs[-1]*100:.2f}%'
     
@@ -223,8 +232,8 @@ def evaluate(do_save=False):
 def save_everything():
     ## Save configs, code, and model plot
     utils.check_create_path(model_path)
-    tf.keras.utils.plot_model(model, to_file=str(model_path / 'plot.png'),
-                              show_shapes=True, expand_nested=True)
+    # print("Model Path: ", str(model_path))
+    # tf.keras.utils.plot_model(model, to_file=str(model_path / 'plot.svg'), show_shapes=True, expand_nested=True)
     shutil.copy(str(code_path), str(model_path / 'training_code.py'))
     shutil.copy(str(dir_path / config_name), str(model_path / config_name))
 
@@ -251,8 +260,8 @@ if __name__ == '__main__':
 
         train(model, tstep, single_outputs_name, final_outputs_name)
 
-        elapsed = datetime.now()
-        utils.printd('Elapsed Time: '+''.join(str((elapsed - start_time)).split('.')[:-1]))
+        # elapsed = datetime.now()
+        # utils.printd('Elapsed Time: '+''.join(str((elapsed - start_time)).split('.')[:-1]))
 
         do_save = 'save' in tstep.keys() and tstep['save']
 
