@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 class Paths:
-    ROOT = Path(".")
-    class_paral = ROOT / "trained_models"
+    ROOT = Path("/opt/project/data")
+    class_paral = ROOT #/ "trained_models"
     
 #     ds_dir = CIFAR_DIR / "datasets"
 #     train_ds = ds_dir / "train_ds.npy"
